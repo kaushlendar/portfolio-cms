@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./AdminLogin";
 
+const API_URL = "https://portfolio-cms-backend-03gt.onrender.com";
+
 function App() {
     const [contactForm, setContactForm] = useState({
         name: "",
@@ -25,7 +27,7 @@ function App() {
     useEffect(() => {
         // ================= PROJECTS =================
 
-        fetch("http://localhost:5000/api/projects")
+        fetch(`${API_URL}/api/projects`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -38,7 +40,7 @@ function App() {
 
         // ================= SKILLS =================
 
-        fetch("http://localhost:5000/api/skills")
+        fetch(`${API_URL}/api/skills`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -51,7 +53,7 @@ function App() {
 
         // ================= SERVICES =================
 
-        fetch("http://localhost:5000/api/services")
+        fetch(`${API_URL}/api/services`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -64,7 +66,7 @@ function App() {
 
         // ================= EXPERIENCE =================
 
-        fetch("http://localhost:5000/api/experience")
+        fetch(`${API_URL}/api/experience`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -77,7 +79,7 @@ function App() {
 
         // ================= BLOGS =================
 
-        fetch("http://localhost:5000/api/blogs/published")
+        fetch(`${API_URL}/api/blogs/published`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -95,9 +97,7 @@ function App() {
             : null;
 
         if (blogSlug) {
-            fetch(
-                `http://localhost:5000/api/blogs/slug/${blogSlug}`
-            )
+            fetch(`${API_URL}/api/blogs/slug/${blogSlug}`)
                 .then((res) => res.json())
                 .then((data) => {
                     if (data.success) {
@@ -105,16 +105,13 @@ function App() {
                     }
                 })
                 .catch((error) => {
-                    console.error(
-                        "Blog details error:",
-                        error
-                    );
+                    console.error("Blog details error:", error);
                 });
         }
 
         // ================= SETTINGS =================
 
-        fetch("http://localhost:5000/api/settings")
+        fetch(`${API_URL}/api/settings`)
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
@@ -122,10 +119,7 @@ function App() {
                 }
             })
             .catch((error) => {
-                console.error(
-                    "Settings error:",
-                    error
-                );
+                console.error("Settings error:", error);
             });
     }, []);
 
@@ -137,18 +131,13 @@ function App() {
         setContactMessage("Sending...");
 
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/contact",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify(contactForm)
-                }
-            );
+            const response = await fetch(`${API_URL}/api/contact`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(contactForm)
+            });
 
             const data = await response.json();
 
@@ -165,15 +154,11 @@ function App() {
                 });
             } else {
                 setContactMessage(
-                    data.message ||
-                        "Failed to send message"
+                    data.message || "Failed to send message"
                 );
             }
         } catch (error) {
-            console.error(
-                "Contact error:",
-                error
-            );
+            console.error("Contact error:", error);
 
             setContactMessage(
                 "Server error. Please try again."
@@ -182,10 +167,7 @@ function App() {
     };
 
     // Temporary Settings check
-    console.log(
-        "Portfolio Settings:",
-        settings
-    );
+    console.log("Portfolio Settings:", settings);
 
     /* ================= ADMIN ================= */
 
@@ -201,9 +183,7 @@ function App() {
 
     /* ================= BLOG DETAILS ================= */
 
-    if (
-        window.location.pathname.startsWith("/blog/")
-    ) {
+    if (window.location.pathname.startsWith("/blog/")) {
         if (!selectedBlog) {
             return (
                 <div
@@ -230,33 +210,15 @@ function App() {
                         </div>
 
                         <div className="nav-links">
-                            <a href="/">
-                                Home
-                            </a>
-
-                            <a href="/#about">
-                                About
-                            </a>
-
-                            <a href="/#projects">
-                                Projects
-                            </a>
-
-                            <a href="/#skills">
-                                Skills
-                            </a>
-
+                            <a href="/">Home</a>
+                            <a href="/#about">About</a>
+                            <a href="/#projects">Projects</a>
+                            <a href="/#skills">Skills</a>
                             <a href="/#experience">
                                 Experience
                             </a>
-
-                            <a href="/#blog">
-                                Blog
-                            </a>
-
-                            <a href="/#contact">
-                                Contact
-                            </a>
+                            <a href="/#blog">Blog</a>
+                            <a href="/#contact">Contact</a>
                         </div>
                     </div>
                 </nav>
@@ -302,8 +264,7 @@ function App() {
                         >
                             <span>
                                 By{" "}
-                                {selectedBlog.author ||
-                                    "Admin"}
+                                {selectedBlog.author || "Admin"}
                             </span>
 
                             {selectedBlog.publishedAt && (
@@ -325,11 +286,13 @@ function App() {
                         {selectedBlog.coverImage && (
                             <img
                                 src={
-                                    selectedBlog.coverImage
+                                    selectedBlog.coverImage.startsWith(
+                                        "http"
+                                    )
+                                        ? selectedBlog.coverImage
+                                        : `${API_URL}${selectedBlog.coverImage}`
                                 }
-                                alt={
-                                    selectedBlog.title
-                                }
+                                alt={selectedBlog.title}
                                 style={{
                                     width: "100%",
                                     maxHeight: "500px",
@@ -444,41 +407,20 @@ function App() {
 
             <nav className="navbar">
                 <div className="nav-container">
-
                     <div className="logo">
                         Kaushlendar
                     </div>
 
                     <div className="nav-links">
-
-                        <a href="#home">
-                            Home
-                        </a>
-
-                        <a href="#about">
-                            About
-                        </a>
-
-                        <a href="#projects">
-                            Projects
-                        </a>
-
-                        <a href="#skills">
-                            Skills
-                        </a>
-
+                        <a href="#home">Home</a>
+                        <a href="#about">About</a>
+                        <a href="#projects">Projects</a>
+                        <a href="#skills">Skills</a>
                         <a href="#experience">
                             Experience
                         </a>
-
-                        <a href="#blog">
-                            Blog
-                        </a>
-
-                        <a href="#contact">
-                            Contact
-                        </a>
-
+                        <a href="#blog">Blog</a>
+                        <a href="#contact">Contact</a>
                     </div>
                 </div>
             </nav>
@@ -496,22 +438,27 @@ function App() {
                         <p className="hero-small">
                             Hello, I'm
                         </p>
-                            <h1>
-                                {settings?.siteTitle || "Kaushlendar Kumar"}
-                            </h1>
 
-                            <h2>
-                                {settings?.heroTitle || "Full Stack Developer"}
-                            </h2>
+                        <h1>
+                            {settings?.siteTitle ||
+                                "Kaushlendar Kumar"}
+                        </h1>
 
-                            <p className="hero-subtitle">
-                                {settings?.tagline || "BCA Graduate • MCA Student"}
-                            </p>
+                        <h2>
+                            {settings?.heroTitle ||
+                                "Full Stack Developer"}
+                        </h2>
+
+                        <p className="hero-subtitle">
+                            {settings?.tagline ||
+                                "BCA Graduate • MCA Student"}
+                        </p>
+
                         <p className="hero-description">
                             I create modern, responsive and
-                            user-friendly web applications using
-                            React, Node.js, Python and other
-                            modern technologies.
+                            user-friendly web applications
+                            using React, Node.js, Python and
+                            other modern technologies.
                         </p>
 
                         <div className="hero-buttons">
@@ -529,405 +476,391 @@ function App() {
                             >
                                 Contact Me
                             </a>
+
                             {settings?.resumeUrl && (
-    <a
-        href={
-            settings.resumeUrl.startsWith("http")
-                ? settings.resumeUrl
-                : `http://localhost:5000${settings.resumeUrl}`
-        }
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn secondary-btn"
-    >
-        View Resume
-    </a>
-)}
+                                <a
+                                    href={
+                                        settings.resumeUrl.startsWith(
+                                            "http"
+                                        )
+                                            ? settings.resumeUrl
+                                            : `${API_URL}${settings.resumeUrl}`
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn secondary-btn"
+                                >
+                                    View Resume
+                                </a>
+                            )}
 
                         </div>
                     </div>
 
                     <div className="hero-image">
+                        <img
+                            src={
+                                settings?.profileImage
+                                    ? settings.profileImage.startsWith(
+                                          "http"
+                                      )
+                                        ? settings.profileImage
+                                        : `${API_URL}${settings.profileImage}`
+                                    : `${API_URL}/uploads/1790315198191-586469568.jpg`
+                            }
+                            alt={
+                                settings?.siteTitle ||
+                                "Kaushlendar Kumar"
+                            }
+                        />
+                    </div>
 
-<img
-    src={
-        settings?.profileImage
-            ? settings.profileImage.startsWith("http")
-                ? settings.profileImage
-                : `http://localhost:5000${settings.profileImage}`
-            : "http://localhost:5000/uploads/1790315198191-586469568.jpg"
-    }
-    alt={settings?.siteTitle || "Kaushlendar Kumar"}
-/>
+                </div>
+            </section>
+
+            {/* ================= ABOUT ================= */}
+
+            <section
+                id="about"
+                className="about"
+            >
+                <div className="section-header">
+                    <p>ABOUT ME</p>
+
+                    <h2>
+                        Who I Am
+                    </h2>
+                </div>
+
+                <div className="about-content">
+
+                    <div className="about-text">
+                        <h3>
+                            I'm{" "}
+                            {settings?.siteTitle ||
+                                "Kaushlendar Kumar"}
+                        </h3>
+
+                        <p>
+                            {settings?.aboutText ||
+                                "I am a passionate Full Stack Developer and MCA Student from Bihar, India. I enjoy building modern and user-friendly web applications."}
+                        </p>
+                    </div>
+
+                    <div className="about-details">
+
+                        <div>
+                            <strong>
+                                Education
+                            </strong>
+
+                            <span>
+                                {settings?.tagline ||
+                                    "BCA Graduate • MCA Student"}
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Location
+                            </strong>
+
+                            <span>
+                                {settings?.location ||
+                                    "Bihar, India"}
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Role
+                            </strong>
+
+                            <span>
+                                {settings?.heroTitle ||
+                                    "Full Stack Developer"}
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>
+                                Email
+                            </strong>
+
+                            <span>
+                                {settings?.email ||
+                                    "kaushlendar9508594279@gmail.com"}
+                            </span>
+                        </div>
 
                     </div>
                 </div>
             </section>
 
-{/* ================= ABOUT ================= */}
+            {/* ================= PROJECTS ================= */}
 
-<section
-    id="about"
-    className="about"
->
-    <div className="section-header">
+            <section
+                id="projects"
+                className="about"
+            >
+                <div className="section-header">
+                    <p>MY WORK</p>
 
-        <p>
-            ABOUT ME
-        </p>
+                    <h2>
+                        Projects
+                    </h2>
+                </div>
 
-        <h2>
-            Who I Am
-        </h2>
+                <div className="projects-grid">
 
-    </div>
-
-    <div className="about-content">
-
-        <div className="about-text">
-
-            <h3>
-                I'm {settings?.siteTitle || "Kaushlendar Kumar"}
-            </h3>
-
-            <p>
-                {settings?.aboutText ||
-                    "I am a passionate Full Stack Developer and MCA Student from Bihar, India. I enjoy building modern and user-friendly web applications."}
-            </p>
-
-        </div>
-
-        <div className="about-details">
-
-            <div>
-                <strong>
-                    Education
-                </strong>
-
-                <span>
-                    {settings?.tagline || "BCA Graduate • MCA Student"}
-                </span>
-            </div>
-
-            <div>
-                <strong>
-                    Location
-                </strong>
-
-                <span>
-                    {settings?.location || "Bihar, India"}
-                </span>
-            </div>
-
-            <div>
-                <strong>
-                    Role
-                </strong>
-
-                <span>
-                    {settings?.heroTitle || "Full Stack Developer"}
-                </span>
-            </div>
-
-            <div>
-                <strong>
-                    Email
-                </strong>
-
-                <span>
-                    {settings?.email ||
-                        "kaushlendar9508594279@gmail.com"}
-                </span>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-{/* ================= PROJECTS ================= */}
-
-<section
-    id="projects"
-    className="about"
->
-    <div className="section-header">
-
-        <p>MY WORK</p>
-
-        <h2>Projects</h2>
-
-    </div>
-
-    <div className="projects-grid">
-
-        {projects.length === 0 ? (
-
-            <p>No projects available.</p>
-
-        ) : (
-
-            projects.map((project) => (
-
-                <div
-                    className="project-card"
-                    key={project._id}
-                >
-
-                    <div className="project-content">
-
-                        {/* Project Image */}
-
-                        {project.image && (
-
-                            <div className="project-image">
-
-                                <img
-                                    src={
-                                        project.image.startsWith("http")
-                                            ? project.image
-                                            : `http://localhost:5000${project.image}`
-                                    }
-                                    alt={project.title}
-                                />
-
-                            </div>
-
-                        )}
-
-                        {/* Project Title */}
-
-                        <h3>
-                            {project.title}
-                        </h3>
-
-                        {/* Project Description */}
-
+                    {projects.length === 0 ? (
                         <p>
-                            {project.description}
+                            No projects available.
                         </p>
+                    ) : (
+                        projects.map((project) => (
+                            <div
+                                className="project-card"
+                                key={project._id}
+                            >
+                                <div className="project-content">
 
-                        {/* Technologies */}
+                                    {/* Project Image */}
 
-                        {project.technologies &&
-                            project.technologies.length > 0 && (
+                                    {project.image && (
+                                        <div className="project-image">
+                                            <img
+                                                src={
+                                                    project.image.startsWith(
+                                                        "http"
+                                                    )
+                                                        ? project.image
+                                                        : `${API_URL}${project.image}`
+                                                }
+                                                alt={
+                                                    project.title
+                                                }
+                                            />
+                                        </div>
+                                    )}
 
-                                <div className="project-tech">
+                                    {/* Project Title */}
 
-                                    {project.technologies.map(
-                                        (tech, index) => (
+                                    <h3>
+                                        {project.title}
+                                    </h3>
 
-                                            <span key={index}>
-                                                {tech}
-                                            </span>
+                                    {/* Project Description */}
 
-                                        )
+                                    <p>
+                                        {project.description}
+                                    </p>
+
+                                    {/* Technologies */}
+
+                                    {project.technologies &&
+                                        project.technologies.length >
+                                            0 && (
+                                            <div className="project-tech">
+                                                {project.technologies.map(
+                                                    (
+                                                        tech,
+                                                        index
+                                                    ) => (
+                                                        <span
+                                                            key={
+                                                                index
+                                                            }
+                                                        >
+                                                            {tech}
+                                                        </span>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+
+                                    {/* Project Buttons */}
+
+                                    {(project.liveUrl ||
+                                        project.githubUrl) && (
+                                        <div className="project-buttons">
+
+                                            {project.liveUrl && (
+                                                <a
+                                                    href={
+                                                        project.liveUrl
+                                                    }
+                                                    className="btn primary-btn"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    Live Demo
+                                                </a>
+                                            )}
+
+                                            {project.githubUrl && (
+                                                <a
+                                                    href={
+                                                        project.githubUrl
+                                                    }
+                                                    className="btn secondary-btn"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    GitHub
+                                                </a>
+                                            )}
+
+                                        </div>
                                     )}
 
                                 </div>
-
-                            )}
-
-                        {/* Project Buttons */}
-
-                        {(project.liveUrl ||
-                            project.githubUrl) && (
-
-                            <div className="project-buttons">
-
-                                {project.liveUrl && (
-
-                                    <a
-                                        href={project.liveUrl}
-                                        className="btn primary-btn"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        Live Demo
-                                    </a>
-
-                                )}
-
-                                {project.githubUrl && (
-
-                                    <a
-                                        href={project.githubUrl}
-                                        className="btn secondary-btn"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        GitHub
-                                    </a>
-
-                                )}
-
                             </div>
+                        ))
+                    )}
 
-                        )}
+                </div>
+            </section>
 
-                    </div>
+            {/* ================= SKILLS ================= */}
+
+            <section
+                id="skills"
+                className="about"
+            >
+                <div className="section-header">
+
+                    <p>
+                        MY EXPERTISE
+                    </p>
+
+                    <h2>
+                        Skills
+                    </h2>
 
                 </div>
 
-            ))
+                <div className="skills-grid">
 
-        )}
+                    {skills.length > 0 ? (
+                        Object.entries(
+                            skills.reduce(
+                                (groups, skill) => {
+                                    if (!groups[skill.category]) {
+                                        groups[skill.category] = [];
+                                    }
 
-    </div>
+                                    groups[skill.category].push(
+                                        skill
+                                    );
 
-</section>
+                                    return groups;
+                                },
+                                {}
+                            )
+                        ).map(
+                            ([category, categorySkills]) => (
+                                <div
+                                    className="skill-card"
+                                    key={category}
+                                >
+                                    <h3>
+                                        {category}
+                                    </h3>
 
- {/* ================= SKILLS ================= */}
+                                    <div className="skill-list">
 
-<section
-    id="skills"
-    className="about"
->
-    <div className="section-header">
+                                        {categorySkills.map(
+                                            (skill) => (
+                                                <div
+                                                    className="skill-item"
+                                                    key={skill._id}
+                                                >
+                                                    <span>
+                                                        {
+                                                            skill.name
+                                                        }
+                                                    </span>
 
-        <p>
-            MY EXPERTISE
-        </p>
+                                                    {skill.level >
+                                                        0 && (
+                                                        <span className="skill-level">
+                                                            {
+                                                                skill.level
+                                                            }
+                                                            %
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )
+                                        )}
 
-        <h2>
-            Skills
-        </h2>
-
-    </div>
-
-    <div className="skills-grid">
-
-        {skills.length > 0 ? (
-
-            Object.entries(
-                skills.reduce((groups, skill) => {
-
-                    if (!groups[skill.category]) {
-                        groups[skill.category] = [];
-                    }
-
-                    groups[skill.category].push(skill);
-
-                    return groups;
-
-                }, {})
-            ).map(([category, categorySkills]) => (
-
-                <div
-                    className="skill-card"
-                    key={category}
-                >
-
-                    <h3>
-                        {category}
-                    </h3>
-
-                    <div className="skill-list">
-
-                        {categorySkills.map((skill) => (
-
-                            <div
-                                className="skill-item"
-                                key={skill._id}
-                            >
-
-                                <span>
-                                    {skill.name}
-                                </span>
-
-                                {skill.level > 0 && (
-
-                                    <span className="skill-level">
-                                        {skill.level}%
-                                    </span>
-
-                                )}
-
-                            </div>
-
-                        ))}
-
-                    </div>
-
-                </div>
-
-            ))
-
-        ) : (
-
-            <p>
-                No skills available.
-            </p>
-
-        )}
-
-    </div>
-
-</section>
-
-{/* ================= SERVICES ================= */}
-
-<section
-    id="services"
-    className="about"
->
-    <div className="section-header">
-
-        <p>
-            WHAT I DO
-        </p>
-
-        <h2>
-            Services
-        </h2>
-
-    </div>
-
-    <div className="services-grid">
-
-        {services.length === 0 ? (
-
-            <p>
-                No services available.
-            </p>
-
-        ) : (
-
-            services.map((service) => (
-
-                <div
-                    className="service-card"
-                    key={service._id}
-                >
-
-                    <div className="service-content">
-
-                        {service.icon && (
-                            <div className="service-icon">
-                                {service.icon}
-                            </div>
-                        )}
-
-                        <h3>
-                            {service.title}
-                        </h3>
-
+                                    </div>
+                                </div>
+                            )
+                        )
+                    ) : (
                         <p>
-                            {service.description}
+                            No skills available.
                         </p>
+                    )}
 
-                    </div>
+                </div>
+            </section>
+
+            {/* ================= SERVICES ================= */}
+
+            <section
+                id="services"
+                className="about"
+            >
+                <div className="section-header">
+
+                    <p>
+                        WHAT I DO
+                    </p>
+
+                    <h2>
+                        Services
+                    </h2>
 
                 </div>
 
-            ))
+                <div className="services-grid">
 
-        )}
+                    {services.length === 0 ? (
+                        <p>
+                            No services available.
+                        </p>
+                    ) : (
+                        services.map((service) => (
+                            <div
+                                className="service-card"
+                                key={service._id}
+                            >
+                                <div className="service-content">
 
-    </div>
+                                    {service.icon && (
+                                        <div className="service-icon">
+                                            {service.icon}
+                                        </div>
+                                    )}
 
-</section>
+                                    <h3>
+                                        {service.title}
+                                    </h3>
+
+                                    <p>
+                                        {service.description}
+                                    </p>
+
+                                </div>
+                            </div>
+                        ))
+                    )}
+
+                </div>
+            </section>
 
             {/* ================= EXPERIENCE ================= */}
 
@@ -935,7 +868,6 @@ function App() {
                 id="experience"
                 className="about"
             >
-
                 <div className="section-header">
 
                     <p>
@@ -951,16 +883,12 @@ function App() {
                 <div className="experience-grid">
 
                     {experiences.length === 0 ? (
-
                         <p>
                             No experience available.
                         </p>
-
                     ) : (
-
                         experiences.map(
                             (experience) => (
-
                                 <div
                                     className="experience-card"
                                     key={experience._id}
@@ -969,7 +897,6 @@ function App() {
                                     <div className="experience-header">
 
                                         <div>
-
                                             <h3>
                                                 {
                                                     experience.jobTitle
@@ -981,51 +908,48 @@ function App() {
                                                     experience.company
                                                 }
                                             </p>
-
                                         </div>
 
                                         <span className="experience-duration">
-
-                                            {experience.startDate}
+                                            {
+                                                experience.startDate
+                                            }
                                             {" – "}
-                                            {experience.endDate}
-
+                                            {
+                                                experience.endDate
+                                            }
                                         </span>
 
                                     </div>
 
                                     {experience.location && (
-
                                         <p className="experience-location">
                                             📍{" "}
-                                            {experience.location}
+                                            {
+                                                experience.location
+                                            }
                                         </p>
-
                                     )}
 
                                     {experience.employmentType && (
-
                                         <p className="experience-type">
                                             {
                                                 experience.employmentType
                                             }
                                         </p>
-
                                     )}
 
                                     {experience.description && (
-
                                         <p className="experience-description">
                                             {
                                                 experience.description
                                             }
                                         </p>
-
                                     )}
 
                                     {experience.technologies &&
-                                        experience.technologies.length > 0 && (
-
+                                        experience.technologies.length >
+                                            0 && (
                                             <div className="experience-skills">
 
                                                 {experience.technologies.map(
@@ -1033,424 +957,409 @@ function App() {
                                                         technology,
                                                         index
                                                     ) => (
-
-                                                        <span key={index}>
-                                                            {technology}
+                                                        <span
+                                                            key={
+                                                                index
+                                                            }
+                                                        >
+                                                            {
+                                                                technology
+                                                            }
                                                         </span>
-
                                                     )
                                                 )}
 
                                             </div>
-
                                         )}
 
                                 </div>
-
                             )
                         )
-
                     )}
 
                 </div>
-
             </section>
 
-{/* ================= BLOG ================= */}
+            {/* ================= BLOG ================= */}
 
-<section
-    id="blog"
-    className="about"
->
-    <div className="section-header">
+            <section
+                id="blog"
+                className="about"
+            >
+                <div className="section-header">
 
-        <p>
-            MY ARTICLES
-        </p>
+                    <p>
+                        MY ARTICLES
+                    </p>
 
-        <h2>
-            Blog
-        </h2>
+                    <h2>
+                        Blog
+                    </h2>
 
-    </div>
+                </div>
 
-    <div className="blog-grid">
+                <div className="blog-grid">
 
-        {blogs.length === 0 ? (
-
-            <p>
-                No blogs available.
-            </p>
-
-        ) : (
-
-            blogs.map((blog) => (
-
-                <article
-                    className="blog-card"
-                    key={blog._id}
-                >
-
-                    {/* Blog Cover Image */}
-
-                    {blog.coverImage && (
-
-                        <img
-                            src={
-                                blog.coverImage.startsWith("http")
-                                    ? blog.coverImage
-                                    : `http://localhost:5000${blog.coverImage}`
-                            }
-                            alt={blog.title}
-                            className="blog-card-image"
-                        />
-
-                    )}
-
-                    <div className="blog-content">
-
-                        {/* Category */}
-
-                        {blog.category && (
-
-                            <span className="blog-category">
-                                {blog.category}
-                            </span>
-
-                        )}
-
-                        {/* Title */}
-
-                        <h3>
-                            {blog.title}
-                        </h3>
-
-                        {/* Excerpt */}
-
+                    {blogs.length === 0 ? (
                         <p>
-                            {blog.excerpt}
+                            No blogs available.
                         </p>
+                    ) : (
+                        blogs.map((blog) => (
+                            <article
+                                className="blog-card"
+                                key={blog._id}
+                            >
 
-                        {/* Tags */}
+                                {/* Blog Cover Image */}
 
-                        {blog.tags &&
-                            blog.tags.length > 0 && (
+                                {blog.coverImage && (
+                                    <img
+                                        src={
+                                            blog.coverImage.startsWith(
+                                                "http"
+                                            )
+                                                ? blog.coverImage
+                                                : `${API_URL}${blog.coverImage}`
+                                        }
+                                        alt={blog.title}
+                                        className="blog-card-image"
+                                    />
+                                )}
 
-                                <div className="blog-card-tags">
+                                <div className="blog-content">
 
-                                    {blog.tags.map(
-                                        (tag, index) => (
+                                    {/* Category */}
 
-                                            <span
-                                                key={index}
-                                            >
-                                                {tag}
-                                            </span>
-
-                                        )
+                                    {blog.category && (
+                                        <span className="blog-category">
+                                            {
+                                                blog.category
+                                            }
+                                        </span>
                                     )}
 
+                                    {/* Title */}
+
+                                    <h3>
+                                        {blog.title}
+                                    </h3>
+
+                                    {/* Excerpt */}
+
+                                    <p>
+                                        {blog.excerpt}
+                                    </p>
+
+                                    {/* Tags */}
+
+                                    {blog.tags &&
+                                        blog.tags.length > 0 && (
+                                            <div className="blog-card-tags">
+
+                                                {blog.tags.map(
+                                                    (
+                                                        tag,
+                                                        index
+                                                    ) => (
+                                                        <span
+                                                            key={
+                                                                index
+                                                            }
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    )
+                                                )}
+
+                                            </div>
+                                        )}
+
+                                    {/* Footer */}
+
+                                    <div className="blog-card-footer">
+
+                                        <span>
+                                            By{" "}
+                                            {blog.author ||
+                                                "Admin"}
+                                        </span>
+
+                                        <a
+                                            href={`/blog/${blog.slug}`}
+                                            className="blog-link"
+                                        >
+                                            Read More →
+                                        </a>
+
+                                    </div>
+
                                 </div>
+                            </article>
+                        ))
+                    )}
 
-                            )}
+                </div>
+            </section>
 
-                        {/* Footer */}
+            {/* ================= CONTACT ================= */}
 
-                        <div className="blog-card-footer">
+            <section
+                id="contact"
+                className="about"
+            >
+                <div className="section-header">
+
+                    <p>
+                        GET IN TOUCH
+                    </p>
+
+                    <h2>
+                        Contact Me
+                    </h2>
+
+                </div>
+
+                <div className="contact-content">
+
+                    {/* Contact Information */}
+
+                    <div className="contact-info">
+
+                        <h3>
+                            Let's Work Together
+                        </h3>
+
+                        <p>
+                            I am open to opportunities,
+                            internships and projects.
+                            Feel free to contact me for
+                            any professional opportunity.
+                        </p>
+
+                        <div className="contact-item">
+
+                            <strong>
+                                Email
+                            </strong>
 
                             <span>
-                                By{" "}
-                                {blog.author || "Admin"}
+                                {settings?.email ||
+                                    "kaushlendar9508594279@gmail.com"}
                             </span>
-
-                            <a
-                                href={`/blog/${blog.slug}`}
-                                className="blog-link"
-                            >
-                                Read More →
-                            </a>
 
                         </div>
 
+                        <div className="contact-item">
+
+                            <strong>
+                                Location
+                            </strong>
+
+                            <span>
+                                {settings?.location ||
+                                    "Bihar, India"}
+                            </span>
+
+                        </div>
+
+                        {settings?.phone && (
+                            <div className="contact-item">
+
+                                <strong>
+                                    Phone
+                                </strong>
+
+                                <span>
+                                    {settings.phone}
+                                </span>
+
+                            </div>
+                        )}
+
                     </div>
 
-                </article>
+                    {/* Contact Form */}
 
-            ))
+                    <form
+                        className="contact-form"
+                        onSubmit={handleContactSubmit}
+                    >
 
-        )}
+                        <input
+                            type="text"
+                            placeholder="Your Name"
+                            value={contactForm.name}
+                            onChange={(e) =>
+                                setContactForm({
+                                    ...contactForm,
+                                    name: e.target.value
+                                })
+                            }
+                            required
+                        />
 
-    </div>
+                        <input
+                            type="email"
+                            placeholder="Your Email"
+                            value={contactForm.email}
+                            onChange={(e) =>
+                                setContactForm({
+                                    ...contactForm,
+                                    email: e.target.value
+                                })
+                            }
+                            required
+                        />
 
-</section>
-{/* ================= CONTACT ================= */}
+                        <input
+                            type="text"
+                            placeholder="Subject"
+                            value={contactForm.subject}
+                            onChange={(e) =>
+                                setContactForm({
+                                    ...contactForm,
+                                    subject: e.target.value
+                                })
+                            }
+                            required
+                        />
 
-<section
-    id="contact"
-    className="about"
->
-    <div className="section-header">
+                        <textarea
+                            placeholder="Your Message"
+                            rows="6"
+                            value={contactForm.message}
+                            onChange={(e) =>
+                                setContactForm({
+                                    ...contactForm,
+                                    message: e.target.value
+                                })
+                            }
+                            required
+                        />
 
-        <p>
-            GET IN TOUCH
-        </p>
+                        <button
+                            type="submit"
+                            className="btn primary-btn"
+                        >
+                            Send Message
+                        </button>
 
-        <h2>
-            Contact Me
-        </h2>
+                        {contactMessage && (
+                            <p className="contact-message">
+                                {contactMessage}
+                            </p>
+                        )}
 
-    </div>
+                    </form>
 
-    <div className="contact-content">
+                </div>
+            </section>
 
-        {/* Contact Information */}
+            {/* ================= FOOTER ================= */}
 
-        <div className="contact-info">
+            <footer className="footer">
 
-            <h3>
-                Let's Work Together
-            </h3>
+                <div className="footer-content">
 
-            <p>
-                I am open to opportunities,
-                internships and projects.
-                Feel free to contact me for
-                any professional opportunity.
-            </p>
+                    {/* Name */}
 
-            <div className="contact-item">
+                    <h3>
+                        {settings?.siteTitle ||
+                            "Kaushlendar Kumar"}
+                    </h3>
 
-                <strong>
-                    Email
-                </strong>
+                    {/* Role + Tagline */}
 
-                <span>
-                    {settings?.email ||
-                        "kaushlendar9508594279@gmail.com"}
-                </span>
+                    <p>
+                        {settings?.heroTitle ||
+                            "Full Stack Developer"}{" "}
+                        •{" "}
+                        {settings?.tagline ||
+                            "BCA Graduate • MCA Student"}
+                    </p>
 
-            </div>
+                    {/* Footer Navigation */}
 
-            <div className="contact-item">
+                    <div className="footer-links">
 
-                <strong>
-                    Location
-                </strong>
+                        <a href="#home">
+                            Home
+                        </a>
 
-                <span>
-                    {settings?.location ||
-                        "Bihar, India"}
-                </span>
+                        <a href="#about">
+                            About
+                        </a>
 
-            </div>
+                        <a href="#projects">
+                            Projects
+                        </a>
 
-            {settings?.phone && (
+                        <a href="#skills">
+                            Skills
+                        </a>
 
-                <div className="contact-item">
+                        <a href="#blog">
+                            Blog
+                        </a>
 
-                    <strong>
-                        Phone
-                    </strong>
+                        <a href="#contact">
+                            Contact
+                        </a>
 
-                    <span>
-                        {settings.phone}
-                    </span>
+                    </div>
+
+                    {/* Social Links */}
+
+                    <div className="social-links">
+
+                        {settings?.githubUrl && (
+                            <a
+                                href={settings.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                GitHub
+                            </a>
+                        )}
+
+                        {settings?.linkedinUrl && (
+                            <a
+                                href={settings.linkedinUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                LinkedIn
+                            </a>
+                        )}
+
+                        {settings?.instagramUrl && (
+                            <a
+                                href={settings.instagramUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Instagram
+                            </a>
+                        )}
+
+                    </div>
+
+                    {/* Copyright */}
+
+                    <p className="copyright">
+                        © {new Date().getFullYear()}{" "}
+                        {settings?.siteTitle ||
+                            "Kaushlendar Kumar"}.
+                        All Rights Reserved.
+                    </p>
 
                 </div>
 
-            )}
+            </footer>
 
         </div>
-
-        {/* Contact Form */}
-
-        <form
-            className="contact-form"
-            onSubmit={handleContactSubmit}
-        >
-
-            <input
-                type="text"
-                placeholder="Your Name"
-                value={contactForm.name}
-                onChange={(e) =>
-                    setContactForm({
-                        ...contactForm,
-                        name: e.target.value
-                    })
-                }
-                required
-            />
-
-            <input
-                type="email"
-                placeholder="Your Email"
-                value={contactForm.email}
-                onChange={(e) =>
-                    setContactForm({
-                        ...contactForm,
-                        email: e.target.value
-                    })
-                }
-                required
-            />
-
-            <input
-                type="text"
-                placeholder="Subject"
-                value={contactForm.subject}
-                onChange={(e) =>
-                    setContactForm({
-                        ...contactForm,
-                        subject: e.target.value
-                    })
-                }
-                required
-            />
-
-            <textarea
-                placeholder="Your Message"
-                rows="6"
-                value={contactForm.message}
-                onChange={(e) =>
-                    setContactForm({
-                        ...contactForm,
-                        message: e.target.value
-                    })
-                }
-                required
-            />
-
-            <button
-                type="submit"
-                className="btn primary-btn"
-            >
-                Send Message
-            </button>
-
-            {contactMessage && (
-
-                <p className="contact-message">
-                    {contactMessage}
-                </p>
-
-            )}
-
-        </form>
-
-    </div>
-
-</section>
-{/* ================= FOOTER ================= */}
-
-<footer className="footer">
-
-    <div className="footer-content">
-
-        {/* Name */}
-
-        <h3>
-            {settings?.siteTitle || "Kaushlendar Kumar"}
-        </h3>
-
-        {/* Role + Tagline */}
-
-        <p>
-            {settings?.heroTitle || "Full Stack Developer"} •{" "}
-            {settings?.tagline || "BCA Graduate • MCA Student"}
-        </p>
-
-        {/* Footer Navigation */}
-
-        <div className="footer-links">
-
-            <a href="#home">
-                Home
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
-            <a href="#projects">
-                Projects
-            </a>
-
-            <a href="#skills">
-                Skills
-            </a>
-
-            <a href="#blog">
-                Blog
-            </a>
-
-            <a href="#contact">
-                Contact
-            </a>
-
-        </div>
-
-        {/* Social Links */}
-
-        <div className="social-links">
-
-            {settings?.githubUrl && (
-
-                <a
-                    href={settings.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    GitHub
-                </a>
-
-            )}
-
-            {settings?.linkedinUrl && (
-
-                <a
-                    href={settings.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    LinkedIn
-                </a>
-
-            )}
-
-            {settings?.instagramUrl && (
-
-                <a
-                    href={settings.instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Instagram
-                </a>
-
-            )}
-
-        </div>
-
-        {/* Copyright */}
-
-        <p className="copyright">
-
-            © {new Date().getFullYear()}{" "}
-
-            {settings?.siteTitle || "Kaushlendar Kumar"}.
-
-            All Rights Reserved.
-
-        </p>
-
-    </div>
-
-</footer>
-
-</div>
-);
-
+    );
 }
 
 export default App;
